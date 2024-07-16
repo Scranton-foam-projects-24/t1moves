@@ -263,9 +263,7 @@ def edge_neighbors(cell_major_vertices, target_1, target_2, edge_cells):
         
         # edge neighbors lose their CCW "greater" vertex
         del cell_major_vertices[n][greater_idx]
-        
-        
-        
+          
 
 def vertex_neighbors(cell_major_vertices, target_1, target_2, vert_cells):
     
@@ -282,7 +280,6 @@ def vertex_neighbors(cell_major_vertices, target_1, target_2, vert_cells):
             idx = cell_major_vertices[n].index(target_2)
             cell_major_vertices[n].insert(idx,target_1)
             vertex_added = target_1
-    
     
         # update adj matrix
         prior_idx = idx - 1
@@ -304,7 +301,6 @@ dots_num = 10
 
 colors = np.random.rand(dots_num, 3) 
 points = np.random.rand(dots_num, 2)
- 
 
 # make color map (unnecessary for just random colorization)
 color_map = {tuple(coords):color for coords, color in zip(points, colors)}
