@@ -489,101 +489,102 @@ def histogram_edges(H,data):
     plt.ylim([0,len(data)])
     
     
+if __name__ == "__main__":
     
-print("Generating Voronoi diagram...")
-plt.figure('voro')
-np.random.seed([1938430])
- 
-# generates 10 "random" lists with 2 elements, over [0,1)
-# also picks colors
-
-dots_num = 499
-
-colors = np.random.rand(dots_num, 3) 
-points = np.random.rand(dots_num, 2)
- 
-
-# make color map (unnecessary for just random colorization)
-color_map = {tuple(coords):color for coords, color in zip(points, colors)}
- 
-cells = pyvoro.compute_2d_voronoi(
-points, # point positions, 2D vectors this time.
-[[0.0, 1.0], [0.0, 1.0]], # box size
-2.0, # block size
-periodic = [False,False]
-)
-
-# colorize
-for i, cell in enumerate(cells):    
-    polygon = cell['vertices']
-    plt.fill(*zip(*polygon),  color = 'black', alpha=0.1)
-
-plt.plot(points[:,0], points[:,1], 'ko')
-plt.xlim(-0.1, 1.1)
-plt.ylim(-0.1, 1.1)
-
-# plt.show()
-
-print("Voronoi diagram created!")
-
-print("Generating nx...")
-plt.figure('nx')
-H, pos, major_list, outer, cell_major_vertices, vertices_in_cell = voro_to_nx()
-H = vnx_add_edges(H, major_list)
-print("Nx created!")
-print("Populating adjacency matrix...")
-adj_matrix = adj_matrix_from_vnx(H)
-print("Adjacency matrix created!")
-print("Populating laplacian...")
-laplacian = laplacian_from_adj(H,adj_matrix)
-print("Laplacian created!")
-print("Populating io_matrix...")
-io_matrix = convert_to_inner_outer(True, laplacian, outer)
-print("io_matrix populated!")
-
-
-num_t1 = 5000
-# do_num_t1_moves(num_t1)
- 
-# To manually select targets for t1 moves, use the following:
-# do_t1_move(cell_major_vertices,major_list, target_1,target_2, edge_cells,vertex_cells)
-
-plt.figure('nx')
-# Draw graph with vertex labels
-# nx.draw_networkx(H, pos, with_labels=True, node_size = 15)
-
-print("Updating...")
-update_P2_and_pos(H,io_matrix,outer,pos)
-print("Update complete!")
-
-# Draw graph without vertex labels
-# nx.draw_networkx(H, pos, with_labels=False, node_size = 0)
-areas = compute_cell_areas(pos,cell_major_vertices)
-plt.figure('area')
-histogram_area(H,areas)
-
-plt.figure('logarea')
-log_areas = compute_cell_log_areas(areas)
-histogram_log_area(H,log_areas)
-
-plt.figure('edge')
-edge = []
-for n in cell_major_vertices:
-    num_edges= len(cell_major_vertices[n])
-    edge.append(num_edges)
-for n in range(0,len(edge)):
-    if edge[n] > math.ceil(len(edge)/5):
-        edge[n] = math.ceil(len(edge)/5)
-        
-histogram_edges(H,edge)
-
-snapshot_interval = 100
-print("Beginning GIF generation...")
-generate_gif(snapshot_interval,num_t1,duration=.1)
-print("GIF generation done!")
-
-plt.figure('nx')
-
-# nx.draw_networkx(H, pos, with_labels=False, node_size = 0)
-# nx.draw_networkx(H, pos, with_labels=True, node_size = 15)
-# update_everything(H,laplacian,outer,pos)
+    print("Generating Voronoi diagram...")
+    plt.figure('voro')
+    np.random.seed([1938430])
+     
+    # generates 10 "random" lists with 2 elements, over [0,1)
+    # also picks colors
+    
+    dots_num = 499
+    
+    colors = np.random.rand(dots_num, 3) 
+    points = np.random.rand(dots_num, 2)
+     
+    
+    # make color map (unnecessary for just random colorization)
+    color_map = {tuple(coords):color for coords, color in zip(points, colors)}
+     
+    cells = pyvoro.compute_2d_voronoi(
+    points, # point positions, 2D vectors this time.
+    [[0.0, 1.0], [0.0, 1.0]], # box size
+    2.0, # block size
+    periodic = [False,False]
+    )
+    
+    # colorize
+    for i, cell in enumerate(cells):    
+        polygon = cell['vertices']
+        plt.fill(*zip(*polygon),  color = 'black', alpha=0.1)
+    
+    plt.plot(points[:,0], points[:,1], 'ko')
+    plt.xlim(-0.1, 1.1)
+    plt.ylim(-0.1, 1.1)
+    
+    # plt.show()
+    
+    print("Voronoi diagram created!")
+    
+    print("Generating nx...")
+    plt.figure('nx')
+    H, pos, major_list, outer, cell_major_vertices, vertices_in_cell = voro_to_nx()
+    H = vnx_add_edges(H, major_list)
+    print("Nx created!")
+    print("Populating adjacency matrix...")
+    adj_matrix = adj_matrix_from_vnx(H)
+    print("Adjacency matrix created!")
+    print("Populating laplacian...")
+    laplacian = laplacian_from_adj(H,adj_matrix)
+    print("Laplacian created!")
+    print("Populating io_matrix...")
+    io_matrix = convert_to_inner_outer(True, laplacian, outer)
+    print("io_matrix populated!")
+    
+    
+    num_t1 = 5000
+    # do_num_t1_moves(num_t1)
+     
+    # To manually select targets for t1 moves, use the following:
+    # do_t1_move(cell_major_vertices,major_list, target_1,target_2, edge_cells,vertex_cells)
+    
+    plt.figure('nx')
+    # Draw graph with vertex labels
+    # nx.draw_networkx(H, pos, with_labels=True, node_size = 15)
+    
+    print("Updating...")
+    update_P2_and_pos(H,io_matrix,outer,pos)
+    print("Update complete!")
+    
+    # Draw graph without vertex labels
+    # nx.draw_networkx(H, pos, with_labels=False, node_size = 0)
+    areas = compute_cell_areas(pos,cell_major_vertices)
+    plt.figure('area')
+    histogram_area(H,areas)
+    
+    plt.figure('logarea')
+    log_areas = compute_cell_log_areas(areas)
+    histogram_log_area(H,log_areas)
+    
+    plt.figure('edge')
+    edge = []
+    for n in cell_major_vertices:
+        num_edges= len(cell_major_vertices[n])
+        edge.append(num_edges)
+    for n in range(0,len(edge)):
+        if edge[n] > math.ceil(len(edge)/5):
+            edge[n] = math.ceil(len(edge)/5)
+            
+    histogram_edges(H,edge)
+    
+    snapshot_interval = 100
+    print("Beginning GIF generation...")
+    generate_gif(snapshot_interval,num_t1,duration=.1)
+    print("GIF generation done!")
+    
+    plt.figure('nx')
+    
+    # nx.draw_networkx(H, pos, with_labels=False, node_size = 0)
+    # nx.draw_networkx(H, pos, with_labels=True, node_size = 15)
+    # update_everything(H,laplacian,outer,pos)
