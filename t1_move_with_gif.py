@@ -573,10 +573,9 @@ if __name__ == "__main__":
     edge = []
     for n in cell_major_vertices:
         num_edges= len(cell_major_vertices[n])
+        if num_edges > 20:
+            num_edges
         edge.append(num_edges)
-    for n in range(0,len(edge)):
-        if edge[n] > math.ceil(len(edge)/5):
-            edge[n] = math.ceil(len(edge)/5)
             
     histogram_edges(H,edge)
     
