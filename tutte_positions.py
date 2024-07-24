@@ -24,8 +24,8 @@ def laplacian_from_adj(G,adj_matrix):
     for n in range(1,len(adj_matrix)):
         for m in range(1,len(adj_matrix)):
             if n == m:
-                laplacian[n,m] = 3     #This will probably cause a problem later, but it works for now
-            elif adj_matrix[n,m] == 1:
+                laplacian[n][m] = len([x for x in G.neighbors(n)])
+            elif adj_matrix[n][m] == 1:
                 laplacian[n][m] = -1
             else:
                 laplacian[n][m] = 0
@@ -99,7 +99,7 @@ def update_pos(P2,pos,outer):
             pos[p2_it + outer_it] = P2[p2_it - 1]
             p2_it += 1
         
-    # return pos
+    return pos
 
 
 # def update_matrix_and_pos(G,matrix,P2,pos,outer):
