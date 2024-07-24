@@ -18,7 +18,7 @@ def update_matrix(G,adj_matrix):
                 adj_matrix[n][m] = 0
     return adj_matrix
 
-def laplacian_from_adj(adj_matrix):
+def laplacian_from_adj(G,adj_matrix):
     
     laplacian = copy.copy(adj_matrix)
     for n in range(1,len(adj_matrix)):
