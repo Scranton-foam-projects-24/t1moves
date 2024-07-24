@@ -353,7 +353,7 @@ def generate_gif(num_per_shot,num_t1,duration):
     log_area = []
     edges = []
     
-    while num_t1_in_gif < num_t1:
+    while num_t1_in_gif <= num_t1:
         
         snap_title = str("snap"+str(snap_num)+".png")
         
