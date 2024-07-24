@@ -403,7 +403,7 @@ def generate_gif(num_per_shot,num_t1,duration):
         
         snap_num += 1
         
-        print("Image "+str(snap_num)+"/"+str(int(num_t1/num_per_shot))+" saved!")
+        print("Image "+str(snap_num-1)+"/"+str(int(num_t1/num_per_shot))+" saved!")
         
     plt.figure('nx')
     diagram[0].save((str(gif_dest)+'diagram.gif'),format='GIF',append_images=diagram[0:],save_all=True,duration=duration,loop=0)
