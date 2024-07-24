@@ -330,7 +330,8 @@ def vertex_neighbors(cell_major_vertices, target_1, target_2, vert_cells):
 
 def generate_gif(num_per_shot,num_t1,duration):
     
-    # WARNING: WILL DELETE THE DIRECTORY
+    # WARNING: WILL DELETE THE TARGET DESTINATION BEFORE EACH RUN
+    # Example for diag_dest - C:\Users\...\Downloads\T1_Moves\diag_snapshots
     # Recommended: /.../diag, /.../area, etc.
     diag_dest = # Destination of folder containing snapshots of voro diagram
     area_dest = # Destination of folder containing snapshots of area histogram
