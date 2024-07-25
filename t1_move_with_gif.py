@@ -333,18 +333,19 @@ def generate_gif(num_per_shot,num_t1,duration):
     # WARNING: WILL DELETE THE TARGET DESTINATION BEFORE EACH RUN
     # Example for diag_dest - C:\Users\...\Downloads\T1_Moves\diag_snapshots
     # Recommended: /.../diag, /.../area, etc.
-    diag_dest = # Destination of folder containing snapshots of voro diagram
-    area_dest = # Destination of folder containing snapshots of area histogram
-    log_area_dest = # Destination of folder containing snapshots of log(area) histogram
-    edge_dest = # Destination of folder containing snapshots of edge number histogram
-    dest_list = [diag_dest,area_dest,log_area_dest,edge_dest]
+    diag_dest = "./diag/"
+    area_dest = "./area/"
+    log_area_dest = "./log_area/"
+    edge_dest = "./edge/"
+    gif_dest = "./gifs/"
+    dest_list = [diag_dest,area_dest,log_area_dest,edge_dest,gif_dest]
     
     for n in dest_list:
         if os.path.exists(n):
             shutil.rmtree(n)
         os.makedirs(n)
     
-    gif_dest = # Destination of GIFs
+    
     
     snap_num = 0
     num_t1_in_gif = 0
@@ -546,7 +547,7 @@ if __name__ == "__main__":
     print("io_matrix populated!")
     
     
-    num_t1 = 5000
+    num_t1 = 500
     # do_num_t1_moves(num_t1)
      
     # To manually select targets for t1 moves, use the following:
