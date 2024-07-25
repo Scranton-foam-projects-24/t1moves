@@ -547,7 +547,7 @@ if __name__ == "__main__":
     print("io_matrix populated!")
     
     
-    num_t1 = 500
+    num_t1 = 5000000
     # do_num_t1_moves(num_t1)
      
     # To manually select targets for t1 moves, use the following:
