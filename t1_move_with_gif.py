@@ -355,7 +355,7 @@ def generate_gif(num_per_shot,num_t1,duration):
     
     while num_t1_in_gif <= num_t1:
         
-        turn_dists.append(nx_utils.nx_to_pyvoro(cell_major_vertices, pos))
+        turn_dists.append(nx_utils.network_disorder(cell_major_vertices, pos))
         
         snap_title = str("snap"+str(snap_num)+".png")
         

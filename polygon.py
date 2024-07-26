@@ -3,19 +3,32 @@ import numpy as np
 
 class Polygon():
     """
-    Creates a polygon with an initial number of sides
-    """    
-
+    Creates an instance of a polygon.
+    """
+    
     def regpoly(self, n):
         """
         Return list of verticies of a polygon of n sides with perimeter = 1.
+
+        Parameters
+        ----------
+        n : int
+            Number of sides the regular polygon will have.
+
+        Raises
+        ------
+        ValueError
+            Raised when the input number of sides is less than 2.
+
+        Returns
+        -------
+        points: list
+            A list containing the vertex positions of a regular n-gon.
+
         """
-    
-        if n <= 1:
+
+        if n < 2:
             raise ValueError("Too few number of sides.")
-            
-        if n > 1024:
-            raise ValueError("Too many sides for turning-function package.")
             
         # Calculate length of individual side for polygon with perimeter = 1
         side_len = 1/n
@@ -32,6 +45,13 @@ class Polygon():
         """
         Produces a plot visualizing a polygon constructed by the provided
         coordinates.
+
+        Parameters
+        ----------
+        points : list
+            A list of an array like objects of length 2 which contain the (x,y)
+            coordinates of the various vertices to be plotted.
+
         """
         
         # Unzip list of coordinate pairs into two lists
@@ -50,6 +70,20 @@ class Polygon():
         plt.show()
         
     def randpoly(self, n):
+        """
+        Return a list of randomly generated coordinate pairs of an n-gon.
+
+        Parameters
+        ----------
+        n : int
+            The desired number sides of the randomly generated n-gon.
+
+        Returns
+        -------
+        points : list
+            A list containing the vertex positions of a random n-gon.
+
+        """
         x_coords = [np.random.uniform(-1, 1) for _ in range(n)]
         y_coords = [np.random.uniform(-1, 1) for _ in range(n)]
         points = [list(a) for a in zip(x_coords, y_coords)]
@@ -57,6 +91,27 @@ class Polygon():
         return points            
     
     def poly(self, angles, radii):
+        """
+        Convert a set of angles and radii into coordinate pairs. All radii are
+        measured from the origin. Each individual angle begins from the x-axis
+        and continues in the counterclockwise direction.
+
+        Parameters
+        ----------
+        angles : list
+            List of angles which each start at the x-axis and continue in a
+            counterclockwise direction.
+        radii : list
+            List of values with specify lengths of line segments starting at
+            the origin.
+
+        Returns
+        -------
+        points : list
+            A list containing the vertex positions specified by combining the
+            given angles and radii.
+
+        """
         points = []
         points.append((radii[0],0))
         
@@ -81,6 +136,27 @@ class Polygon():
         return points
     
     def normpoly(self, n, mu=0.0, sigma=0.01):
+        """
+        Return a list of coordinate pairs randomly generated using a normal
+        distribution.
+
+        Parameters
+        ----------
+        n : int
+            Number of sides the resulting polygon will have.
+        mu : float, optional
+            The mean used in the normal distribution calculation. The default
+            is 0.0.
+        sigma : float, optional
+            The standard deviation used in the normal distribution calculation.
+            The default is 0.01.
+
+        Returns
+        -------
+        points : list
+            A list containing the vertex positions of a regular n-gon.
+
+        """
         initpoly = self.regpoly(n)[0:-1]
         
         points = []
@@ -88,6 +164,7 @@ class Polygon():
             np.random.normal
             x += np.random.normal(mu, sigma)
             y += np.random.normal(mu, sigma)
+            np.random.normal()
             points.append((x,y))
         
         return points
