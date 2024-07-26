@@ -1,19 +1,21 @@
 import turning_function
+import statistics as stat
+import numpy as np
+
 from polygon import Polygon
 
-def nx_to_pyvoro(cells, pos, areas, n=-1):
+def nx_to_pyvoro(cells, pos, n=-1):
     
     poly = Polygon()
     comp_poly = poly.regpoly(n) if n != -1 else None
     
-    vertices = []
     turn_dists = []
     
     for cell in cells:
         polygon = cells[cell]
-        # print("cell:", polygon)
+        vertices = []
         for i in range(len(polygon)):
-            vertices.append(pos[polygon[i]])
+            vertices.append(np.array(pos[polygon[i]]))
             
         if n == -1:
             comp_poly = poly.regpoly(len(polygon))
@@ -23,9 +25,10 @@ def nx_to_pyvoro(cells, pos, areas, n=-1):
             comp_poly, 
             brute_force_updates=False
         )
-        print(dist)
+        
+        # print(polygon, dist)
         turn_dists.append(dist)
-    
-    return turn_dists
+
+    return stat.mean(turn_dists)
         
     

@@ -355,10 +355,12 @@ def generate_gif(num_per_shot,num_t1,duration):
     
     while num_t1_in_gif <= num_t1:
         
+        turn_dists.append(nx_utils.nx_to_pyvoro(cell_major_vertices, pos))
+        
         snap_title = str("snap"+str(snap_num)+".png")
         
         plt.figure('nx')
-        nx.draw_networkx(H, pos, with_labels=True, node_size = 0)
+        nx.draw_networkx(H, pos, with_labels=False, node_size = 0)
         plt.savefig(str(diag_dest)+str(snap_title),dpi=200)
         img = Image.open(str(diag_dest)+str(snap_title)) 
         diagram.append(img)
@@ -403,8 +405,6 @@ def generate_gif(num_per_shot,num_t1,duration):
         
         snap_num += 1
         
-        turn_dists = nx_utils.nx_to_pyvoro(cell_major_vertices, pos, areas)
-        
         print("Image "+str(snap_num-1)+"/"+str(int(num_t1/num_per_shot))+" saved!")
         
     plt.figure('nx')
@@ -419,6 +419,7 @@ def generate_gif(num_per_shot,num_t1,duration):
     plt.figure('edge')
     edges[0].save((str(gif_dest)+'edges.gif'),format='GIF',append_images=edges[0:],save_all=True,duration=75,loop=0)
     
+    return turn_dists
     
 def compute_cell_areas(pos,cell_major_vertices):
     
@@ -589,8 +590,10 @@ if __name__ == "__main__":
     
     snapshot_interval = 100
     print("Beginning GIF generation...")
-    generate_gif(snapshot_interval,num_t1,duration=.1)
+    turn_dists = generate_gif(snapshot_interval,num_t1,duration=.1)
     print("GIF generation done!")
+    
+    print(turn_dists)
     
     plt.figure('nx')
     
