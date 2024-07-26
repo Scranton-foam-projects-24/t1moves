@@ -22,6 +22,8 @@ import os
 
 import math
 
+import nx_utils
+
 ImageFile.LOAD_TRUNCATED_IMAGES=True
 def voro_to_nx():
     
@@ -331,8 +333,6 @@ def vertex_neighbors(cell_major_vertices, target_1, target_2, vert_cells):
 def generate_gif(num_per_shot,num_t1,duration):
     
     # WARNING: WILL DELETE THE TARGET DESTINATION BEFORE EACH RUN
-    # Example for diag_dest - C:\Users\...\Downloads\T1_Moves\diag_snapshots
-    # Recommended: /.../diag, /.../area, etc.
     diag_dest = "./diag/"
     area_dest = "./area/"
     log_area_dest = "./log_area/"
@@ -345,16 +345,17 @@ def generate_gif(num_per_shot,num_t1,duration):
             shutil.rmtree(n)
         os.makedirs(n)
     
-    
-    
     snap_num = 0
     num_t1_in_gif = 0
     diagram = []
     area = []
     log_area = []
     edges = []
+    turn_dists = []
     
     while num_t1_in_gif <= num_t1:
+        
+        turn_dists.append(nx_utils.network_disorder(cell_major_vertices, pos))
         
         snap_title = str("snap"+str(snap_num)+".png")
         
@@ -418,6 +419,7 @@ def generate_gif(num_per_shot,num_t1,duration):
     plt.figure('edge')
     edges[0].save((str(gif_dest)+'edges.gif'),format='GIF',append_images=edges[0:],save_all=True,duration=75,loop=0)
     
+    return turn_dists
     
 def compute_cell_areas(pos,cell_major_vertices):
     
@@ -502,7 +504,7 @@ if __name__ == "__main__":
     # generates 10 "random" lists with 2 elements, over [0,1)
     # also picks colors
     
-    dots_num = 499
+    dots_num = 10
     
     colors = np.random.rand(dots_num, 3) 
     points = np.random.rand(dots_num, 2)
@@ -518,10 +520,15 @@ if __name__ == "__main__":
     periodic = [False,False]
     )
     
+    fig = plt.figure()
+    ax = fig.add_subplot()
+    
     # colorize
     for i, cell in enumerate(cells):    
         polygon = cell['vertices']
         plt.fill(*zip(*polygon),  color = 'black', alpha=0.1)
+        for i, edge in enumerate(np.array(polygon)):
+            ax.annotate(i, edge, xytext=[edge[0]+0.01, edge[1]+0.01])
     
     plt.plot(points[:,0], points[:,1], 'ko')
     plt.xlim(-0.1, 1.1)
@@ -547,7 +554,7 @@ if __name__ == "__main__":
     print("io_matrix populated!")
     
     
-    num_t1 = 5000000
+    num_t1 = 500
     # do_num_t1_moves(num_t1)
      
     # To manually select targets for t1 moves, use the following:
@@ -578,13 +585,15 @@ if __name__ == "__main__":
         if num_edges > 20:
             num_edges
         edge.append(num_edges)
-            
+    
     histogram_edges(H,edge)
     
     snapshot_interval = 100
     print("Beginning GIF generation...")
-    generate_gif(snapshot_interval,num_t1,duration=.1)
+    turn_dists = generate_gif(snapshot_interval,num_t1,duration=.1)
     print("GIF generation done!")
+    
+    print(turn_dists)
     
     plt.figure('nx')
     
