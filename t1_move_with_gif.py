@@ -355,69 +355,71 @@ def generate_gif(num_per_shot,num_t1,duration):
     
     while num_t1_in_gif <= num_t1:
         
+        print("Recording Network Disorder###")
         turn_dists.append(nx_utils.network_disorder(cell_major_vertices, pos))
         
-        snap_title = str("snap"+str(snap_num)+".png")
+        # snap_title = str("snap"+str(snap_num)+".png")
         
-        plt.figure('nx')
-        nx.draw_networkx(H, pos, with_labels=False, node_size = 0)
-        plt.savefig(str(diag_dest)+str(snap_title),dpi=200)
-        img = Image.open(str(diag_dest)+str(snap_title)) 
-        diagram.append(img)
-        plt.close()
+        # plt.figure('nx')
+        # nx.draw_networkx(H, pos, with_labels=False, node_size = 0)
+        # plt.savefig(str(diag_dest)+str(snap_title),dpi=200)
+        # img = Image.open(str(diag_dest)+str(snap_title)) 
+        # diagram.append(img)
+        # plt.close()
         
-        plt.figure('area')
-        plt.savefig(str(area_dest)+str(snap_title))
-        img = Image.open(str(area_dest)+str(snap_title)) 
-        area.append(img)
-        plt.close()
+        # plt.figure('area')
+        # plt.savefig(str(area_dest)+str(snap_title))
+        # img = Image.open(str(area_dest)+str(snap_title)) 
+        # area.append(img)
+        # plt.close()
         
-        plt.figure('logarea')
-        plt.savefig(str(log_area_dest)+str(snap_title))
-        img = Image.open(str(log_area_dest)+str(snap_title)) 
-        log_area.append(img)
-        plt.close()
+        # plt.figure('logarea')
+        # plt.savefig(str(log_area_dest)+str(snap_title))
+        # img = Image.open(str(log_area_dest)+str(snap_title)) 
+        # log_area.append(img)
+        # plt.close()
         
-        plt.figure('edge')
-        plt.savefig(str(edge_dest)+str(snap_title))
-        img = Image.open(str(edge_dest)+str(snap_title)) 
-        edges.append(img)
-        plt.close()
+        # plt.figure('edge')
+        # plt.savefig(str(edge_dest)+str(snap_title))
+        # img = Image.open(str(edge_dest)+str(snap_title)) 
+        # edges.append(img)
+        # plt.close()
         
-        plt.figure('nx')
+        # plt.figure('nx')
         print("Doing some t1 moves...")
         do_num_t1_moves(num_per_shot, num_per_shot)
         print("t1 moves done (for now)!")
         num_t1_in_gif += num_per_shot
         
-        areas = compute_cell_areas(pos,cell_major_vertices)
-        histogram_area(H,areas)
-        log_areas = compute_cell_log_areas(areas)
-        histogram_log_area(H,log_areas)
-
-        edge = []
-        for n in cell_major_vertices:
-            num_edges= len(cell_major_vertices[n])
-            if num_edges > 20:
-                num_edges = 20
-            edge.append(num_edges)
-        histogram_edges(H,edge)
+        # areas = compute_cell_areas(pos,cell_major_vertices)
+        # histogram_area(H,areas)
+        # log_areas = compute_cell_log_areas(areas)
+        # print("here")
+        # histogram_log_area(H,log_areas)
+        
+        # edge = []
+        # for n in cell_major_vertices:
+        #     num_edges= len(cell_major_vertices[n])
+        #     if num_edges > 20:
+        #         num_edges = 20
+        #     edge.append(num_edges)
+        # histogram_edges(H,edge)
         
         snap_num += 1
         
         print("Image "+str(snap_num-1)+"/"+str(int(num_t1/num_per_shot))+" saved!")
         
-    plt.figure('nx')
-    diagram[0].save((str(gif_dest)+'diagram.gif'),format='GIF',append_images=diagram[0:],save_all=True,duration=duration,loop=0)
+    # plt.figure('nx')
+    # diagram[0].save((str(gif_dest)+'diagram.gif'),format='GIF',append_images=diagram[0:],save_all=True,duration=duration,loop=0)
     
-    plt.figure('area')
-    area[0].save((str(gif_dest)+'area.gif'),format='GIF',append_images=area[0:],save_all=True,duration=75,loop=0)
+    # plt.figure('area')
+    # area[0].save((str(gif_dest)+'area.gif'),format='GIF',append_images=area[0:],save_all=True,duration=75,loop=0)
     
-    plt.figure('logarea')
-    area[0].save((str(gif_dest)+'log_area.gif'),format='GIF',append_images=log_area[0:],save_all=True,duration=75,loop=0)
+    # plt.figure('logarea')
+    # area[0].save((str(gif_dest)+'log_area.gif'),format='GIF',append_images=log_area[0:],save_all=True,duration=75,loop=0)
             
-    plt.figure('edge')
-    edges[0].save((str(gif_dest)+'edges.gif'),format='GIF',append_images=edges[0:],save_all=True,duration=75,loop=0)
+    # plt.figure('edge')
+    # edges[0].save((str(gif_dest)+'edges.gif'),format='GIF',append_images=edges[0:],save_all=True,duration=75,loop=0)
     
     return turn_dists
     
@@ -504,7 +506,7 @@ if __name__ == "__main__":
     # generates 10 "random" lists with 2 elements, over [0,1)
     # also picks colors
     
-    dots_num = 10
+    dots_num = 249
     
     colors = np.random.rand(dots_num, 3) 
     points = np.random.rand(dots_num, 2)
@@ -527,8 +529,8 @@ if __name__ == "__main__":
     for i, cell in enumerate(cells):    
         polygon = cell['vertices']
         plt.fill(*zip(*polygon),  color = 'black', alpha=0.1)
-        for i, edge in enumerate(np.array(polygon)):
-            ax.annotate(i, edge, xytext=[edge[0]+0.01, edge[1]+0.01])
+        # for i, edge in enumerate(np.array(polygon)):
+        #     ax.annotate(i, edge, xytext=[edge[0]+0.01, edge[1]+0.01])
     
     plt.plot(points[:,0], points[:,1], 'ko')
     plt.xlim(-0.1, 1.1)
@@ -554,7 +556,7 @@ if __name__ == "__main__":
     print("io_matrix populated!")
     
     
-    num_t1 = 500
+    num_t1 = 5000
     # do_num_t1_moves(num_t1)
      
     # To manually select targets for t1 moves, use the following:

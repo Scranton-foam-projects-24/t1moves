@@ -37,19 +37,22 @@ def network_disorder(cells, pos, n=-1):
     
     for cell in cells:
         polygon = cells[cell]
+        # print(len(polygon))
         vertices = []
+        # num_sides = len(polygon)
         for i in range(len(polygon)):
             vertices.append(np.array(pos[polygon[i]]))
+        print(vertices)
             
         if n == -1:
             comp_poly = poly.regpoly(len(polygon))
-        
+        # print("calling turning_function.distance()")
         dist, _, _, _ = turning_function.distance(
             vertices, 
             comp_poly, 
             brute_force_updates=False
         )
-        
+        # print("computed turning distance")
         turn_dists.append(dist)
 
     return stat.mean(turn_dists)
