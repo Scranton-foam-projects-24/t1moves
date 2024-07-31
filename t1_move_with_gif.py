@@ -359,25 +359,19 @@ def generate_gif(num_per_shot,num_t1,duration):
         
         print("Recording Network Disorder###")
         areas = compute_cell_areas(pos,cell_major_vertices)
+        dists = nx_utils.network_disorder(
+            cell_major_vertices, 
+            pos,
+            n=n,
+            areas=areas
+        )
         if weighted:
             turn_dists.append(
-                np.sum(nx_utils.network_disorder(
-                    cell_major_vertices, 
-                    pos,
-                    n=n,
-                    weighted=weighted,
-                    areas=areas
-                ))
+                np.sum(dists)
             )
         else:
             turn_dists.append(
-                np.mean(nx_utils.network_disorder(
-                    cell_major_vertices, 
-                    pos,
-                    n=n,
-                    weighted=weighted,
-                    areas=areas
-                ))
+                np.mean(dists)
             )
         
         # snap_title = str("snap"+str(snap_num)+".png")

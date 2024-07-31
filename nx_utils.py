@@ -24,12 +24,13 @@ def has_overlapping_vertices(vertices):
     """
     for i, vertex1 in enumerate(vertices):
         for j, vertex2 in enumerate(vertices):
-            # print(f"{round(vertex1[0],7)} == {round(vertex2[0],7)}, {round(vertex1[1],7)} == {round(vertex2[1],7)}, {i} != {j}")
-            if round(vertex1[0],7) == round(vertex2[0],7) and round(vertex1[1],7) == round(vertex2[1],7) and i != j:
+            if (round(vertex1[0],7) == round(vertex2[0],7) and
+                round(vertex1[1],7) == round(vertex2[1],7) and
+                i != j):
                 return True
     return False
 
-def network_disorder(cells, pos, n=-1, weighted=False, areas=None):
+def network_disorder(cells, pos, n=-1, areas=None):
     """
     Return the network disorder of the network.
 
@@ -45,23 +46,22 @@ def network_disorder(cells, pos, n=-1, weighted=False, areas=None):
         The number of sides of the regular polygon which every cell will be
         compared to. If -1 (default), every cell will be compared to a k-gon,
         where k is equal to the number of sides of each cell.
-    weighted : bool
-        Optional argument specifying whether the function should weight each
-        turning distance by the area of the cell. Default is False.
-    areas : list
+    areas : list, optional
         Optional argument containing the list of cell areas to be used when
-        weighting computed turning distances. Must be used when weighted=True.
+        weighting computed turning distances. If None (default), the turning
+        distance of each cell will not be multiplied by the cell area.
 
     Returns
     -------
     list
         A list containing the turning distance of each cell with respect to the
         specified polygon. Default behavior compares each cell to the regular
-        k-gon and returns and does not weight the result by cell area.
+        k-gon and does not weight the distances by cell area.
 
     """
-    if weighted and areas == None:
-        raise TypeError("Weighted turning distances requires areas.")
+    
+    # This line is very "pythonic".
+    weighted = True if areas is not None else False
     
     poly = Polygon()
     comp_poly = poly.regpoly(n) if n != -1 else None
@@ -80,7 +80,6 @@ def network_disorder(cells, pos, n=-1, weighted=False, areas=None):
         else:
             if n == -1:
                 comp_poly = poly.regpoly(len(polygon))
-            # print(vertices)
             dist, _, _, _ = turning_function.distance(
                 vertices, 
                 comp_poly, 
