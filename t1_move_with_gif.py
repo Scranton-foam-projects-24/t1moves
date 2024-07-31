@@ -351,28 +351,35 @@ def generate_gif(num_per_shot,num_t1,duration):
     area = []
     log_area = []
     edges = []
-    turn_dists = []
-    weighted = True
-    n = 6
+    # turn_dists = []
+    # weighted = False
+    # n = -1
+    
+    unweighted_k_gon_dists = []
+    unweighted_6_gon_dists = []
+    weighted_k_gon_dists = []
+    weighted_6_gon_dists = []
     
     while num_t1_in_gif <= num_t1:
         
         print("Recording Network Disorder###")
-        areas = compute_cell_areas(pos,cell_major_vertices)
-        dists = nx_utils.network_disorder(
-            cell_major_vertices, 
-            pos,
-            n=n,
-            areas=areas
+        areas = compute_cell_areas(pos,cell_major_vertices) if weighted else None
+
+        unweighted_k_gon_dists.append(
+            np.mean(nx_utils.network_disorder(cell_major_vertices, pos))
         )
-        if weighted:
-            turn_dists.append(
-                np.sum(dists)
-            )
-        else:
-            turn_dists.append(
-                np.mean(dists)
-            )
+        
+        unweighted_6_gon_dists.append(
+            np.mean(nx_utils.network_disorder(cell_major_vertices, pos, n=6))
+        )
+        
+        weighted_k_gon_dists.append(
+            np.sum(nx_utils.network_disorder(cell_major_vertices, pos))
+        )
+        
+        weighted_6_gon_dists.append(
+            np.sum(nx_utils.network_disorder(cell_major_vertices, pos, n=6))
+        )
         
         # snap_title = str("snap"+str(snap_num)+".png")
         
@@ -436,8 +443,8 @@ def generate_gif(num_per_shot,num_t1,duration):
             
     # plt.figure('edge')
     # edges[0].save((str(gif_dest)+'edges.gif'),format='GIF',append_images=edges[0:],save_all=True,duration=75,loop=0)
-    
-    return turn_dists
+
+    return [unweighted_k_gon_dists, unweighted_6_gon_dists, weighted_k_gon_dists, weighted_6_gon_dists]
     
 def compute_cell_areas(pos,cell_major_vertices):
     
@@ -512,7 +519,21 @@ def histogram_edges(H,data):
     plt.ylabel('Number of Cells')
     plt.ylim([0,len(data)])
     
+
+def scatter_turn_dists(turn_dists, num_t1):
     
+    # plt.figure('turn_dists')
+    # plt.clf()
+    
+    
+    domain = range(0, num_t1+1, 100)
+    plt.plot(domain, turn_dists)
+    a, b = np.polyfit(domain, turn_dists, 1)
+    # plt.plot(domain, a*domain+b)
+    plt.title('Network Disorder vs. t1-moves')
+    plt.xlabel('Number of t1-moves')
+    plt.ylabel('Network Disorder')
+
 if __name__ == "__main__":
     
     print("Generating Voronoi diagram...")
@@ -606,10 +627,19 @@ if __name__ == "__main__":
     turn_dists = generate_gif(snapshot_interval,num_t1,duration=.1)
     print("GIF generation done!")
     
-    print(turn_dists)
+    # print(turn_dists)
     
-    plt.figure('nx')
+    plt.figure('turn_dists')
+    plt.clf()
+    scatter_turn_dists(turn_dists[0], num_t1)
+    scatter_turn_dists(turn_dists[1], num_t1)
+    scatter_turn_dists(turn_dists[2], num_t1)
+    scatter_turn_dists(turn_dists[3], num_t1)
+    
+    # plt.figure('nx')
     
     # nx.draw_networkx(H, pos, with_labels=False, node_size = 0)
     # nx.draw_networkx(H, pos, with_labels=True, node_size = 15)
     # update_everything(H,laplacian,outer,pos)
+    
+    

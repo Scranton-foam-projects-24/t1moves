@@ -24,8 +24,8 @@ def has_overlapping_vertices(vertices):
     """
     for i, vertex1 in enumerate(vertices):
         for j, vertex2 in enumerate(vertices):
-            if (round(vertex1[0],7) == round(vertex2[0],7) and
-                round(vertex1[1],7) == round(vertex2[1],7) and
+            if (round(vertex1[0],10) == round(vertex2[0],10) and
+                round(vertex1[1],10) == round(vertex2[1],10) and
                 i != j):
                 return True
     return False
