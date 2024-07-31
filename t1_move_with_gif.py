@@ -352,11 +352,33 @@ def generate_gif(num_per_shot,num_t1,duration):
     log_area = []
     edges = []
     turn_dists = []
+    weighted = True
+    n = 6
     
     while num_t1_in_gif <= num_t1:
         
         print("Recording Network Disorder###")
-        turn_dists.append(nx_utils.network_disorder(cell_major_vertices, pos))
+        areas = compute_cell_areas(pos,cell_major_vertices)
+        if weighted:
+            turn_dists.append(
+                np.sum(nx_utils.network_disorder(
+                    cell_major_vertices, 
+                    pos,
+                    n=n,
+                    weighted=weighted,
+                    areas=areas
+                ))
+            )
+        else:
+            turn_dists.append(
+                np.mean(nx_utils.network_disorder(
+                    cell_major_vertices, 
+                    pos,
+                    n=n,
+                    weighted=weighted,
+                    areas=areas
+                ))
+            )
         
         # snap_title = str("snap"+str(snap_num)+".png")
         
@@ -522,15 +544,10 @@ if __name__ == "__main__":
     periodic = [False,False]
     )
     
-    fig = plt.figure()
-    ax = fig.add_subplot()
-    
     # colorize
     for i, cell in enumerate(cells):    
         polygon = cell['vertices']
         plt.fill(*zip(*polygon),  color = 'black', alpha=0.1)
-        # for i, edge in enumerate(np.array(polygon)):
-        #     ax.annotate(i, edge, xytext=[edge[0]+0.01, edge[1]+0.01])
     
     plt.plot(points[:,0], points[:,1], 'ko')
     plt.xlim(-0.1, 1.1)
