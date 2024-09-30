@@ -7,8 +7,8 @@ def generate_gif(num_per_shot, total_moves):
     
     # Destination of snapshots and gif
     #   Make sure to change these or it will not work!
-    snap_dest = '/Users/ryan/Desktop/Python_Programs/T1_Gifs/diag/'
-    gif_dest = '/Users/ryan/Desktop/Python_Programs/T1_Gifs/'
+    snap_dest = '/Users/r92830873/Library/CloudStorage/OneDrive-UniversityofScranton/githubpullz/t1moves/t1giffolder_snap/'
+    gif_dest = '/Users/r92830873/Library/CloudStorage/OneDrive-UniversityofScranton/githubpullz/t1moves/t1giffolder/'
     
     # Put all folders for snapshots in this list, it will clear the folder
     #   before it each new run

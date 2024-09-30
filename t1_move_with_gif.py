@@ -322,14 +322,15 @@ def generate_gif(num_per_shot,num_t1,duration):
     area_dest = "./area/"
     log_area_dest = "./log_area/"
     edge_dest = "./edge/"
-    dest_list = [diag_dest,area_dest,log_area_dest,edge_dest]
+    gif_dest = "./gifs/"
+    dest_list = [diag_dest,area_dest,log_area_dest,edge_dest, gif_dest]
     
     for n in dest_list:
         if os.path.exists(n):
             shutil.rmtree(n)
         os.makedirs(n)
     
-    gif_dest = "./gifs/"
+    
     
     snap_num = 0
     num_t1_in_gif = 0
@@ -601,7 +602,7 @@ if __name__ == "__main__":
     # do_num_t1_moves(num_t1)
     
     # How many T1 moves happen between snapshots in the GIF
-    snapshot_interval = 10000
+    snapshot_interval = 1000
     
     print("Beginning GIF generation...")
     generate_gif(snapshot_interval,num_t1,duration=.1)
