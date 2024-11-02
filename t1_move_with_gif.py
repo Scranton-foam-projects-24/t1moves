@@ -351,9 +351,9 @@ def generate_gif(num_per_shot,num_t1,duration):
     area = []
     log_area = []
     edges = []
-    # turn_dists = []
-    # weighted = False
-    # n = -1
+    turn_dists = []
+    weighted = False
+    n = -1
     
     unweighted_k_gon_dists = []
     unweighted_6_gon_dists = []
@@ -363,7 +363,7 @@ def generate_gif(num_per_shot,num_t1,duration):
     while num_t1_in_gif <= num_t1:
         
         print("Recording Network Disorder###")
-        areas = compute_cell_areas(pos,cell_major_vertices) if weighted else None
+        areas = compute_cell_areas(pos,cell_major_vertices)
 
         unweighted_k_gon_dists.append(
             np.mean(nx_utils.network_disorder(cell_major_vertices, pos))
@@ -374,11 +374,11 @@ def generate_gif(num_per_shot,num_t1,duration):
         )
         
         weighted_k_gon_dists.append(
-            np.sum(nx_utils.network_disorder(cell_major_vertices, pos))
+            np.sum(nx_utils.network_disorder(cell_major_vertices, pos, areas=areas))
         )
         
         weighted_6_gon_dists.append(
-            np.sum(nx_utils.network_disorder(cell_major_vertices, pos, n=6))
+            np.sum(nx_utils.network_disorder(cell_major_vertices, pos, n=6, areas=areas))
         )
         
         # snap_title = str("snap"+str(snap_num)+".png")
@@ -444,7 +444,10 @@ def generate_gif(num_per_shot,num_t1,duration):
     # plt.figure('edge')
     # edges[0].save((str(gif_dest)+'edges.gif'),format='GIF',append_images=edges[0:],save_all=True,duration=75,loop=0)
 
-    return [unweighted_k_gon_dists, unweighted_6_gon_dists, weighted_k_gon_dists, weighted_6_gon_dists]
+    return [unweighted_k_gon_dists,
+            unweighted_6_gon_dists,
+            weighted_k_gon_dists,
+            weighted_6_gon_dists]
     
 def compute_cell_areas(pos,cell_major_vertices):
     
@@ -520,18 +523,24 @@ def histogram_edges(H,data):
     plt.ylim([0,len(data)])
     
 
-def scatter_turn_dists(turn_dists, num_t1):
+def scatter_turn_dists(turn_dists, num_t1, linestyle = "solid", label = "None"):
     
     # plt.figure('turn_dists')
     # plt.clf()
     
     
     domain = range(0, num_t1+1, 100)
-    plt.plot(domain, turn_dists)
+    plt.plot(
+        domain, 
+        turn_dists, 
+        color="black", 
+        linestyle=linestyle, 
+        label=label)
+    print(turn_dists)
     a, b = np.polyfit(domain, turn_dists, 1)
     # plt.plot(domain, a*domain+b)
-    plt.title('Network Disorder vs. t1-moves')
-    plt.xlabel('Number of t1-moves')
+    plt.title('Network Disorder vs. T1-moves')
+    plt.xlabel('Number of T1-moves')
     plt.ylabel('Network Disorder')
 
 if __name__ == "__main__":
@@ -629,12 +638,18 @@ if __name__ == "__main__":
     
     # print(turn_dists)
     
+    # unweighted_k_gon_dists = []
+    # unweighted_6_gon_dists = []
+    # weighted_k_gon_dists = []
+    # weighted_6_gon_dists = []
+    
     plt.figure('turn_dists')
     plt.clf()
-    scatter_turn_dists(turn_dists[0], num_t1)
-    scatter_turn_dists(turn_dists[1], num_t1)
-    scatter_turn_dists(turn_dists[2], num_t1)
-    scatter_turn_dists(turn_dists[3], num_t1)
+    scatter_turn_dists(turn_dists[0], num_t1, linestyle="solid", label = "Unweighted Nonhexagonal")
+    scatter_turn_dists(turn_dists[1], num_t1, linestyle="dotted", label = "Unweighted Hexagonal")
+    scatter_turn_dists(turn_dists[2], num_t1, linestyle="dashed", label = "Weighted Nonhexagonal")
+    scatter_turn_dists(turn_dists[3], num_t1, linestyle="dashdot", label = "Weighted Hexagonal")
+    plt.legend()
     
     # plt.figure('nx')
     
