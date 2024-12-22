@@ -4,7 +4,6 @@ import scipy as sp
 import scipy.special as spec
 import scipy.stats as stats
 import csv
-import pylab
 import pyvoro
 
 import networkx as nx
@@ -25,6 +24,15 @@ import math
 import nx_utils
 
 ImageFile.LOAD_TRUNCATED_IMAGES=True
+
+
+#random seed
+
+rand.seed(2347) 
+
+
+
+
 def voro_to_nx():
     
     # [-1,-1] is a dummy entry for ease of working with pos
@@ -359,18 +367,27 @@ def generate_gif(num_per_shot,num_t1,duration):
     unweighted_6_gon_dists = []
     weighted_k_gon_dists = []
     weighted_6_gon_dists = []
+    weighted_circ_dists = []
+    unweighted_circ_dists = []
     
     while num_t1_in_gif <= num_t1:
         
         print("Recording Network Disorder###")
+        
         areas = compute_cell_areas(pos,cell_major_vertices)
-
+        
+        print(min(areas))
+        # print(len(areas))
         unweighted_k_gon_dists.append(
             np.mean(nx_utils.network_disorder(cell_major_vertices, pos))
         )
         
         unweighted_6_gon_dists.append(
             np.mean(nx_utils.network_disorder(cell_major_vertices, pos, n=6))
+        )
+        
+        unweighted_circ_dists.append(
+            np.nanmean(nx_utils.network_disorder(cell_major_vertices, pos, n=-2))
         )
         
         weighted_k_gon_dists.append(
@@ -381,10 +398,14 @@ def generate_gif(num_per_shot,num_t1,duration):
             np.sum(nx_utils.network_disorder(cell_major_vertices, pos, n=6, areas=areas))
         )
         
+        weighted_circ_dists.append(
+            np.nansum(nx_utils.network_disorder(cell_major_vertices, pos, n=-2, areas=areas))
+        )
+        
         # snap_title = str("snap"+str(snap_num)+".png")
         
-        # plt.figure('nx')
-        # nx.draw_networkx(H, pos, with_labels=False, node_size = 0)
+        plt.figure('nx')
+        nx.draw_networkx(H, pos, with_labels=False, node_size = 0)
         # plt.savefig(str(diag_dest)+str(snap_title),dpi=200)
         # img = Image.open(str(diag_dest)+str(snap_title)) 
         # diagram.append(img)
@@ -446,8 +467,10 @@ def generate_gif(num_per_shot,num_t1,duration):
 
     return [unweighted_k_gon_dists,
             unweighted_6_gon_dists,
+            unweighted_circ_dists,
             weighted_k_gon_dists,
-            weighted_6_gon_dists]
+            weighted_6_gon_dists,
+            weighted_circ_dists]
     
 def compute_cell_areas(pos,cell_major_vertices):
     
@@ -465,8 +488,8 @@ def compute_cell_areas(pos,cell_major_vertices):
             sum_of_determinants += det
             
         area = .5 * sum_of_determinants
-        if area > .05:
-            area = .05
+        # if area > .05:
+        #     area = .05
         areas.append(area)
         
     return areas
@@ -523,21 +546,21 @@ def histogram_edges(H,data):
     plt.ylim([0,len(data)])
     
 
-def scatter_turn_dists(turn_dists, num_t1, linestyle = "solid", label = "None"):
+def scatter_turn_dists(turn_distz, num_t1, linestyle = "solid", kolor = "black", label = "None"):
     
     # plt.figure('turn_dists')
     # plt.clf()
     
     
-    domain = range(0, num_t1+1, 100)
+    domain = np.linspace(0, num_t1, int(num_t1/snapshot_interval)+1)
     plt.plot(
         domain, 
-        turn_dists, 
-        color="black", 
+        turn_distz, 
+        color= kolor, 
         linestyle=linestyle, 
         label=label)
-    print(turn_dists)
-    a, b = np.polyfit(domain, turn_dists, 1)
+    print(turn_distz)
+    # a, b = np.polyfit(domain, turn_dists, 1)
     # plt.plot(domain, a*domain+b)
     plt.title('Network Disorder vs. T1-moves')
     plt.xlabel('Number of T1-moves')
@@ -552,7 +575,7 @@ if __name__ == "__main__":
     # generates 10 "random" lists with 2 elements, over [0,1)
     # also picks colors
     
-    dots_num = 249
+    dots_num = 300
     
     colors = np.random.rand(dots_num, 3) 
     points = np.random.rand(dots_num, 2)
@@ -597,7 +620,7 @@ if __name__ == "__main__":
     print("io_matrix populated!")
     
     
-    num_t1 = 5000
+    num_t1 = 1000
     # do_num_t1_moves(num_t1)
      
     # To manually select targets for t1 moves, use the following:
@@ -631,7 +654,7 @@ if __name__ == "__main__":
     
     histogram_edges(H,edge)
     
-    snapshot_interval = 100
+    snapshot_interval = 20
     print("Beginning GIF generation...")
     turn_dists = generate_gif(snapshot_interval,num_t1,duration=.1)
     print("GIF generation done!")
@@ -647,8 +670,10 @@ if __name__ == "__main__":
     plt.clf()
     scatter_turn_dists(turn_dists[0], num_t1, linestyle="solid", label = "Unweighted Nonhexagonal")
     scatter_turn_dists(turn_dists[1], num_t1, linestyle="dotted", label = "Unweighted Hexagonal")
-    scatter_turn_dists(turn_dists[2], num_t1, linestyle="dashed", label = "Weighted Nonhexagonal")
-    scatter_turn_dists(turn_dists[3], num_t1, linestyle="dashdot", label = "Weighted Hexagonal")
+    scatter_turn_dists(turn_dists[2], num_t1, kolor = 'red', label = "Unweighted Cicular")
+    scatter_turn_dists(turn_dists[3], num_t1, linestyle="dashdot", label = "Weighted Nonhexagonal")
+    scatter_turn_dists(turn_dists[4], num_t1, linestyle = ':', label = "Weighted Hexegonal")
+    scatter_turn_dists(turn_dists[5], num_t1, kolor = 'blue', label = "Weighted Circular")    
     plt.legend()
     
     # plt.figure('nx')

@@ -1,5 +1,6 @@
 import turning_function
 import numpy as np
+import math
 
 from polygon import Polygon
 
@@ -30,6 +31,40 @@ def has_overlapping_vertices(vertices):
                 return True
     return False
 
+
+
+#given cumulative perimeters and angles,  here's the formula for circle distance
+
+def circ_dist( p, theta):
+    
+    n = len(p)
+    s1 = [  (2*p[i]- theta[i-1]/np.pi)**3 - (2*p[i-1]- theta[i-1]/np.pi)**3 for i in range(1,n)  ]
+    s2 = [  theta[i-1]*(p[i]- p[i-1])/np.pi for i in range(1,n)]
+    return( np.pi*np.sqrt( 1/6*sum(s1)- (1-sum(s2))**2  )        )
+
+
+def cca(a,b,c):
+    """Calculates the counterclockwise angle between three points."""
+
+    ba = a - b
+    bc = c - b
+    
+    cosine_angle = np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc))
+    angle = np.arccos(cosine_angle)
+    
+    return(np.pi - angle)
+
+
+
+
+
+
+
+
+
+
+
+
 def network_disorder(cells, pos, n=-1, areas=None):
     """
     Return the network disorder of the network.
@@ -37,10 +72,10 @@ def network_disorder(cells, pos, n=-1, areas=None):
     Parameters
     ----------
     cells : dict
-        Dictionary containing cell indicies as keys and a list of cell vertices
+        Dictionary containing cell indices as keys and a list of cell vertices
         in counterclockwise order as values.
     pos : dict
-        Dictionary containing vertex indicies as keys and an array-like object
+        Dictionary containing vertex indices as keys and an array-like object
         containing the (x,y) coordinates of each vertex as values.
     n : int, optional
         The number of sides of the regular polygon which every cell will be
@@ -64,30 +99,68 @@ def network_disorder(cells, pos, n=-1, areas=None):
     weighted = True if areas is not None else False
     
     poly = Polygon()
-    comp_poly = poly.regpoly(n) if n != -1 else None
+    comp_poly = poly.regpoly(n) if ((n != -1) and (n != -2)) else None
+    
     
     turn_dists = []
-    
-    for cell in cells:
-        polygon = cells[cell]
-
-        vertices = []
-        for i in range(len(polygon)):
-            vertices.append(np.array(pos[polygon[i]]))
+    #for the circle case, we have some work to do
+    if n == -2:
+        for cell in cells:
             
-        if has_overlapping_vertices(vertices):
-            turn_dists.append(0)
-        else:
-            if n == -1:
-                comp_poly = poly.regpoly(len(polygon))
-            dist, _, _, _ = turning_function.distance(
-                vertices, 
-                comp_poly, 
-                brute_force_updates=False
-            )
+            polygon = cells[cell]
+            vertices = []
+            
+            for i in range(len(polygon)):
+                vertices.append(np.array(pos[polygon[i]]))
+                
+            
+            disto = [0]+[  math.dist(vertices[i], vertices[i+1])  for i in range(len(vertices)-1) ] + [  math.dist(vertices[-1], vertices[0]) ]
+            p = np.cumsum(disto)/sum(disto)
+
+
+
+
+            pt = [0]+[cca( vertices[i], vertices[i+1], vertices[i+2]) for i in range(len(vertices)-2)] + [cca( vertices[-2], vertices[-1], vertices[0])] +  [cca( vertices[-1], vertices[0], vertices[1])]
+
+            theta = np.cumsum(pt)
+            dist = circ_dist(p,theta)
             if weighted:
-                turn_dists.append(dist * areas[cell])
+                # if math.isnan(dist):
+                #     print(areas[cell])
+                #     print('hey!')
+                turn_dists.append(dist* areas[cell])
             else:
                 turn_dists.append(dist)
+        
+    
+    #this needs to be expanded to include circle distances
+    
+    
+    
+    
+
+    if n != -2:
+        for cell in cells:
+            
+            polygon = cells[cell]
+            vertices = []
+            
+            for i in range(len(polygon)):
+                vertices.append(np.array(pos[polygon[i]]))
+                
+            if has_overlapping_vertices(vertices):
+                turn_dists.append(0)
+            else:
+                if n == -1:
+                    comp_poly = poly.regpoly(len(polygon))
+                dist, _, _, _ = turning_function.distance(
+                    vertices, 
+                    comp_poly, 
+                    brute_force_updates=False
+                )
+                if weighted:
+                    turn_dists.append(dist * areas[cell])
+                else:
+                    turn_dists.append(dist)
 
     return turn_dists
