@@ -55,13 +55,35 @@ def cca(a,b,c):
     return(np.pi - angle)
 
 
+#2-norm
+
+def euc2(p, q):
+    return  np.sqrt(    (p[0]- q[0])**2 + (p[1]- q[1])**2     )
+    
+
+
+#pluck function
+
+def pluck(S):
+    tol = 10**(-5)
+    #last repeated index or current if not repeated
+    repo = 0
+    indo = [0]
+    for i in range(len(S)):
+        #is current not close to repo? If not, append
+        if euc2(S[i], S[repo]) > tol:
+            repo = i
+            indo.append(i)
+    return [S[i] for i in indo]   
 
 
 
 
+def turning_distance(n, k):
+    return np.pi*np.sqrt((4/(n*k))*  np.sum([(1/k*np.floor(i/n)-1/n*np.floor(i/k))**2 for i in range(k*n+1)])-(1/n-1/k)**2)
 
 
-
+print(turning_distance(2,6))
 
 
 
@@ -103,17 +125,27 @@ def network_disorder(cells, pos, n=-1, areas=None):
     
     
     turn_dists = []
-    #for the circle case, we have some work to do
+    #for the circle case, incorporate circle distance
     if n == -2:
         for cell in cells:
             
             polygon = cells[cell]
+            
+
+            
+            
             vertices = []
             
             for i in range(len(polygon)):
                 vertices.append(np.array(pos[polygon[i]]))
                 
-            
+                
+            #pluck!
+            vertices = pluck(vertices)
+            if len(vertices)== 1:
+                print('plucked!')
+                
+
             disto = [0]+[  math.dist(vertices[i], vertices[i+1])  for i in range(len(vertices)-1) ] + [  math.dist(vertices[-1], vertices[0]) ]
             p = np.cumsum(disto)/sum(disto)
 
@@ -125,12 +157,27 @@ def network_disorder(cells, pos, n=-1, areas=None):
             theta = np.cumsum(pt)
             dist = circ_dist(p,theta)
             if weighted:
+                
+                #For shard
+                if len(vertices) == 2:
+                    turn_dists.append( (np.pi/np.sqrt(12))      * areas[cell])
+                elif len(vertices) == 1:
+                    turn_dists.append( (np.pi/(len(polygon)*np.sqrt(3))   * areas[cell]))
+                    
                 # if math.isnan(dist):
                 #     print(areas[cell])
                 #     print('hey!')
-                turn_dists.append(dist* areas[cell])
+                else:
+                    turn_dists.append(dist* areas[cell])
             else:
-                turn_dists.append(dist)
+                
+                #For shard
+                if len(vertices) == 2:
+                    turn_dists.append( (np.pi/np.sqrt(12)))
+                elif len(vertices) == 1:
+                    turn_dists.append( (np.pi/(len(polygon)*np.sqrt(3))) )
+                else:
+                    turn_dists.append(dist)
         
     
     #this needs to be expanded to include circle distances
@@ -148,19 +195,76 @@ def network_disorder(cells, pos, n=-1, areas=None):
             for i in range(len(polygon)):
                 vertices.append(np.array(pos[polygon[i]]))
                 
-            if has_overlapping_vertices(vertices):
-                turn_dists.append(0)
-            else:
-                if n == -1:
-                    comp_poly = poly.regpoly(len(polygon))
-                dist, _, _, _ = turning_function.distance(
-                    vertices, 
-                    comp_poly, 
-                    brute_force_updates=False
-                )
+            #pluck!
+            vertices = pluck(vertices)
+            
+            #comp poly case
+            if n == -1:
+                comp_poly = poly.regpoly(len(polygon))
                 if weighted:
-                    turn_dists.append(dist * areas[cell])
+                    
+                    if len(vertices) == 2:
+                        dist = turning_distance(2,len(polygon))
+                        turn_dists.append( dist    * areas[cell])
+                    elif len(vertices) == 1:
+                        turn_dists.append( 0)
+                    else:
+                        dist, _, _, _ = turning_function.distance(
+                            vertices, 
+                            comp_poly, 
+                            brute_force_updates=False
+                        )
+                        turn_dists.append( dist    * areas[cell])
                 else:
-                    turn_dists.append(dist)
+                    
+                    if len(vertices) == 2:
+                        dist = turning_distance(2,len(polygon))
+                        turn_dists.append( dist   )
+                    elif len(vertices) == 1:
+                        turn_dists.append( 0)
+                    else:
+                        dist, _, _, _ = turning_function.distance(
+                            vertices, 
+                            comp_poly, 
+                            brute_force_updates=False
+                        )
+                        turn_dists.append( dist  )       
+                    
+            
+            #finally, the six-sided case
+            else:
+                comp_poly = poly.regpoly(6)
+                if weighted:
+                    
+                    if len(vertices) == 2:
+                        dist = turning_distance(2,6)
+                        turn_dists.append( dist    * areas[cell])
+                    elif len(vertices) == 1:
+                        dist = turning_distance(len(polygon),6)
+                        turn_dists.append( dist    * areas[cell])
+                    else:
+                        dist, _, _, _ = turning_function.distance(
+                            vertices, 
+                            comp_poly, 
+                            brute_force_updates=False
+                        )
+                        turn_dists.append( dist    * areas[cell])
+                else:
+                    
+                    if len(vertices) == 2:
+                        dist = turning_distance(2,6)
+                        turn_dists.append( dist   )
+                    elif len(vertices) == 1:
+                        dist = turning_distance(len(polygon),6)
+                        turn_dists.append( dist )
+                    else:
+                        dist, _, _, _ = turning_function.distance(
+                            vertices, 
+                            comp_poly, 
+                            brute_force_updates=False
+                        )
+                        turn_dists.append( dist  )  
+                
+            
 
     return turn_dists
