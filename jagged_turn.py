@@ -423,7 +423,7 @@ sampno = 0
 #storing the dataset of turning distances
 
 
-turndata = np.zeros(shape = (tests,6,11))
+turndata = np.zeros(shape = (tests,6,31))
 
 
 
@@ -661,7 +661,7 @@ for qqq in range(tests):
     
     
             #Here, we insert the turning distances
-            if pops % 90 == 0:
+            if pops % 30 == 0:
                 #Stats
                 lenvec = [len(i) for i in polys]
                 vordists[qqq, sampno,:] = [lenvec.count(i) for i in range(25)]
@@ -747,15 +747,17 @@ plt.show()
 
 #plotting the turning distances
 
-plt.plot(turndata[qqq,0,:], label = "k-gon")
-plt.plot(turndata[qqq,1,:], label = "k-gon, weighted")
-plt.plot(turndata[qqq,2,:], label = '6-gon')
-plt.plot(turndata[qqq,3,:], label = '6-gon, weighted')
-plt.plot(turndata[qqq,4,:], label = 'circle')
-plt.plot(turndata[qqq,5,:], label = 'circle, weighted')
+plt.plot(np.linspace(0,900,31),turndata[qqq,2,:], linestyle="solid",color= "black",label = "$\mathcal{D}_6$")
+plt.plot(np.linspace(0,900,31),turndata[qqq,4,:], linestyle="dotted", color= "black",label = "$\mathcal{D}$")
+plt.plot(np.linspace(0,900,31),turndata[qqq,0,:], linestyle = 'dashed',color= "black",label = "$\mathcal{D}_\mathrm{c}$")
+plt.plot(np.linspace(0,900,31),turndata[qqq,3,:], linestyle = (0, (1, 1)),color= "black",label = "$\mathcal{D}_{6,\mathrm{w}}$")
+plt.plot(np.linspace(0,900,31),turndata[qqq,5,:],linestyle="dashdot", color= "black",label = "$\mathcal{D}_\mathrm{w}$")
+plt.plot(np.linspace(0,900,31),turndata[qqq,1,:], linestyle = (0, (3, 1, 1, 1, 1, 1)), color= "black",label = "$\mathcal{D}_{\mathrm{c},\mathrm{w}}$")
+plt.xlabel('Number of ruptures')
+plt.ylabel('Turning disorder')
+plt.xticks(np.linspace(0, 900, 10))
 plt.legend()
 plt.show()
-
 
 
 

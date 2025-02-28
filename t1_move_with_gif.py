@@ -1,9 +1,9 @@
 import numpy as np
-import scipy.interpolate as interpolate
-import scipy as sp
-import scipy.special as spec
-import scipy.stats as stats
-import csv
+# import scipy.interpolate as interpolate
+# import scipy as sp
+# import scipy.special as spec
+# import scipy.stats as stats
+# import csv
 import pyvoro
 
 import networkx as nx
@@ -387,7 +387,7 @@ def generate_gif(num_per_shot,num_t1,duration):
         )
         
         unweighted_circ_dists.append(
-            np.nanmean(nx_utils.network_disorder(cell_major_vertices, pos, n=-2))
+            np.mean(nx_utils.network_disorder(cell_major_vertices, pos, n=-2))
         )
         
         weighted_k_gon_dists.append(
@@ -399,17 +399,19 @@ def generate_gif(num_per_shot,num_t1,duration):
         )
         
         weighted_circ_dists.append(
-            np.nansum(nx_utils.network_disorder(cell_major_vertices, pos, n=-2, areas=areas))
+            np.sum(nx_utils.network_disorder(cell_major_vertices, pos, n=-2, areas=areas))
         )
         
-        # snap_title = str("snap"+str(snap_num)+".png")
+        snap_title = str("snap"+str(snap_num)+".png")
         
         plt.figure('nx')
         nx.draw_networkx(H, pos, with_labels=False, node_size = 0)
-        # plt.savefig(str(diag_dest)+str(snap_title),dpi=200)
-        # img = Image.open(str(diag_dest)+str(snap_title)) 
-        # diagram.append(img)
-        # plt.close()
+        plt.axis('equal')
+        plt.axis('off')
+        plt.savefig(str(diag_dest)+str(snap_title),dpi=200)
+        img = Image.open(str(diag_dest)+str(snap_title)) 
+        diagram.append(img)
+        plt.close()
         
         # plt.figure('area')
         # plt.savefig(str(area_dest)+str(snap_title))
@@ -453,8 +455,8 @@ def generate_gif(num_per_shot,num_t1,duration):
         
         print("Image "+str(snap_num-1)+"/"+str(int(num_t1/num_per_shot))+" saved!")
         
-    # plt.figure('nx')
-    # diagram[0].save((str(gif_dest)+'diagram.gif'),format='GIF',append_images=diagram[0:],save_all=True,duration=duration,loop=0)
+    plt.figure('nx')
+    diagram[0].save((str(gif_dest)+'diagram.gif'),format='GIF',append_images=diagram[0:],save_all=True,duration=duration,loop=0)
     
     # plt.figure('area')
     # area[0].save((str(gif_dest)+'area.gif'),format='GIF',append_images=area[0:],save_all=True,duration=75,loop=0)
@@ -562,9 +564,8 @@ def scatter_turn_dists(turn_distz, num_t1, linestyle = "solid", kolor = "black",
     print(turn_distz)
     # a, b = np.polyfit(domain, turn_dists, 1)
     # plt.plot(domain, a*domain+b)
-    plt.title('Network Disorder vs. T1-moves')
-    plt.xlabel('Number of T1-moves')
-    plt.ylabel('Network Disorder')
+    plt.xlabel('Number of T1 moves')
+    plt.ylabel('Turning Disorder')
 
 if __name__ == "__main__":
     
@@ -575,7 +576,7 @@ if __name__ == "__main__":
     # generates 10 "random" lists with 2 elements, over [0,1)
     # also picks colors
     
-    dots_num = 300
+    dots_num = 1000
     
     colors = np.random.rand(dots_num, 3) 
     points = np.random.rand(dots_num, 2)
@@ -620,7 +621,7 @@ if __name__ == "__main__":
     print("io_matrix populated!")
     
     
-    num_t1 = 1000
+    num_t1 = 3000
     # do_num_t1_moves(num_t1)
      
     # To manually select targets for t1 moves, use the following:
@@ -654,7 +655,7 @@ if __name__ == "__main__":
     
     histogram_edges(H,edge)
     
-    snapshot_interval = 20
+    snapshot_interval = 50
     print("Beginning GIF generation...")
     turn_dists = generate_gif(snapshot_interval,num_t1,duration=.1)
     print("GIF generation done!")
@@ -666,15 +667,21 @@ if __name__ == "__main__":
     # weighted_k_gon_dists = []
     # weighted_6_gon_dists = []
     
+    
+    plt.rcParams.update({'font.size': 15}) 
     plt.figure('turn_dists')
     plt.clf()
-    scatter_turn_dists(turn_dists[0], num_t1, linestyle="solid", label = "Unweighted Nonhexagonal")
-    scatter_turn_dists(turn_dists[1], num_t1, linestyle="dotted", label = "Unweighted Hexagonal")
-    scatter_turn_dists(turn_dists[2], num_t1, kolor = 'red', label = "Unweighted Cicular")
-    scatter_turn_dists(turn_dists[3], num_t1, linestyle="dashdot", label = "Weighted Nonhexagonal")
-    scatter_turn_dists(turn_dists[4], num_t1, linestyle = ':', label = "Weighted Hexegonal")
-    scatter_turn_dists(turn_dists[5], num_t1, kolor = 'blue', label = "Weighted Circular")    
+    scatter_turn_dists(turn_dists[1], num_t1, linestyle="solid", label = "$\mathcal{D}_6$")
+    scatter_turn_dists(turn_dists[0], num_t1, linestyle="dotted", label = "$\mathcal{D}$")
+    scatter_turn_dists(turn_dists[2], num_t1, linestyle = 'dashed', label = "$\mathcal{D}_\mathrm{c}$")
+    scatter_turn_dists(turn_dists[4], num_t1, linestyle = (0, (1, 1)), label = "$\mathcal{D}_{6,\mathrm{w}}$")
+    scatter_turn_dists(turn_dists[3], num_t1, linestyle="dashdot", label = "$\mathcal{D}_\mathrm{w}$")
+    scatter_turn_dists(turn_dists[5], num_t1, linestyle = (0, (3, 1, 1, 1, 1, 1)), label = "$\mathcal{D}_{\mathrm{c},\mathrm{w}}$")    
     plt.legend()
+    
+    
+
+    
     
     # plt.figure('nx')
     
@@ -682,4 +689,14 @@ if __name__ == "__main__":
     # nx.draw_networkx(H, pos, with_labels=True, node_size = 15)
     # update_everything(H,laplacian,outer,pos)
     
+
+plt.rcParams.update({'font.size': 15}) 
+plt.plot(asp, kd, label = "$d_2(R_4, P_a)$", color = 'black',linestyle = "solid")
+plt.plot(asp, cd, label = "$d_2(C, P_a)$", color = 'black', linestyle = "dotted")
+plt.plot(asp, sd, label = "$d_2(R_6, P_a)$",color = 'black',  linestyle = "dashed")
+plt.xlabel("Rectangle aspect ratio $a$")
+plt.ylabel("Turning distance")
+plt.xticks([1,5,10,15,20])
+plt.legend()
+plt.show()
     

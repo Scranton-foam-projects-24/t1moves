@@ -43,16 +43,47 @@ def circ_dist( p, theta):
     return( np.pi*np.sqrt( 1/6*sum(s1)- (1-sum(s2))**2  )        )
 
 
-def cca(a,b,c):
-    """Calculates the counterclockwise angle between three points."""
 
-    ba = a - b
-    bc = c - b
+
+
+# def cca(a,b,c):
+#     """Calculates the counterclockwise angle between three points."""
+
+#     ba = a - b
+#     bc = c - b
     
-    cosine_angle = np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc))
-    angle = np.arccos(cosine_angle)
+#     cosine_angle = np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc))
+#     angle = np.arccos(cosine_angle)
     
-    return(np.pi - angle)
+#     return(np.pi - angle)
+
+
+
+
+def cca(p1, p2, p3):
+    """Calculates the signed angle between three points.
+
+    Args:
+        p1 (tuple): Coordinates of the first point (x1, y1).
+        p2 (tuple): Coordinates of the second point (x2, y2).
+        p3 (tuple): Coordinates of the third point (x3, y3).
+
+    Returns:
+        float: The signed angle in radians.
+    """
+
+    x1, y1 = p1
+    x2, y2 = p2
+    x3, y3 = p3
+
+    # Calculate vectors
+    v1 = (x2 - x1, y2 - y1)
+    v2 = (x3 - x2, y3 - y2)
+
+    # Calculate the angle using the cross product
+    angle = math.atan2(v1[0] * v2[1] - v1[1] * v2[0], v1[0] * v2[0] + v1[1] * v2[1])
+
+    return angle
 
 
 #2-norm
@@ -151,8 +182,8 @@ def network_disorder(cells, pos, n=-1, areas=None):
 
 
 
-
-            pt = [0]+[cca( vertices[i], vertices[i+1], vertices[i+2]) for i in range(len(vertices)-2)] + [cca( vertices[-2], vertices[-1], vertices[0])] +  [cca( vertices[-1], vertices[0], vertices[1])]
+            if len(vertices)>1:
+                pt = [0]+[cca( vertices[i], vertices[i+1], vertices[i+2]) for i in range(len(vertices)-2)] + [cca( vertices[-2], vertices[-1], vertices[0])] +  [cca( vertices[-1], vertices[0], vertices[1])]
 
             theta = np.cumsum(pt)
             dist = circ_dist(p,theta)
@@ -183,8 +214,7 @@ def network_disorder(cells, pos, n=-1, areas=None):
     #this needs to be expanded to include circle distances
     
     
-    
-    
+
 
     if n != -2:
         for cell in cells:
@@ -268,3 +298,34 @@ def network_disorder(cells, pos, n=-1, areas=None):
             
 
     return turn_dists
+
+
+
+
+
+
+
+turning_function.distance([ [0,0], [1,0], [1,1], [0,1]],  [ [0,0], [3/8,0], [3/8,1/8], [0,1/8]  ])
+
+
+asp = np.linspace(1,20, 100)
+kd = np.zeros(100)
+cd = np.zeros(100)
+sd = np.zeros(100)
+theta = [0, np.pi/2, np.pi, 3*np.pi/2, 2*np.pi]
+kk = 0
+for a in asp:
+    p = [0, a/(2*a+2), 1/2, (2*a+1)/(2*a+2), 1  ]
+    cd[kk] = circ_dist(p,theta)
+    
+    kd[kk] = turning_function.distance([ [0,0], [1,0], [1,1], [0,1]],  [ [0,0], [a,0], [a,1], [0,1]  ])[0]
+    
+    sd[kk] = turning_function.distance([ [1,0], [0.5, np.sqrt(3)/2], [-0.5, np.sqrt(3)/2], [-1, 0], [-0.5, -np.sqrt(3)/2], [0.5, -np.sqrt(3)/2]],  [ [0,0], [a,0], [a,1], [0,1]  ])[0]
+    
+    kk += 1
+
+
+
+
+
+
